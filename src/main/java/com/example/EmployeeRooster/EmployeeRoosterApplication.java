@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.*;
 import org.springframework.web.bind.annotation.*;
 import java.sql.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.format.*;
+
 @SpringBootApplication
 @RestController
 @EnableAutoConfiguration
@@ -18,7 +18,6 @@ public class EmployeeRoosterApplication {
     String home() {
 	String last = "";
 	try{
-	    
 	 Connection conn = ConnectionHelper.getConnection();
 	 Statement stmt =  conn.createStatement();
 
@@ -26,18 +25,13 @@ public class EmployeeRoosterApplication {
 	 sql = "SELECT locationname FROM locations";
 	 ResultSet rs = stmt.executeQuery(sql);
 
-	 //STEP 5: Extract data from result set
 	 while(rs.next()){
-	     //Retrieve by column name
 	      last += rs.getString("locationname") + ", ";
-
-	     //Display values
 	     System.out.println(", Last: " + last);
 	 }
 	 if(last.length() > 1){
 	     last = last.substring(0,last.length() -2 );
 	 }
-	 //STEP 6: Clean-up environment
 	 rs.close();
 	 stmt.close();
 	 conn.close();
@@ -49,29 +43,29 @@ public class EmployeeRoosterApplication {
 
 
     @RequestMapping("/getEmps")
-    String getEmployeesByDate(@RequestParam("locid")int locid, @RequestParam("date") @DateTimeFormat(pattern="yyyy-MM-dd") Date date) {
+    String getEmployeesByDate(@RequestParam("locid")int locid, @RequestParam("date") Date date) {
 	String last = "";
+	System.out.println(", Last: " + date.getClass().getName());
+	
 	try{
 	    
 	 Connection conn = ConnectionHelper.getConnection();
 	 Statement stmt =  conn.createStatement();
 
 	 String sql;
-	 sql = "SELECT locationname FROM locations";
+
+	 sql = "select e.employeename from rooster r join employee e  on e.id = r.employeeid where '" + date.toString()+"' between startDate and endDate and location ="+locid;
 	 ResultSet rs = stmt.executeQuery(sql);
 
-	 //STEP 5: Extract data from result set
 	 while(rs.next()){
-	     //Retrieve by column name
-	      last += rs.getString("locationname") + ", ";
 
-	     //Display values
+	      last += rs.getString("employeename") + ", ";
 	     System.out.println(", Last: " + last);
 	 }
 	 if(last.length() > 1){
 	     last = last.substring(0,last.length() -2 );
 	 }
-	 //STEP 6: Clean-up environment
+
 	 rs.close();
 	 stmt.close();
 	 conn.close();
